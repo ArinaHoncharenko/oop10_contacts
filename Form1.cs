@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -15,16 +15,18 @@ namespace oop10_contacts
         {
             InitializeComponent();
 
-            // Ініціалізація списків контактів (додайте власні дані)
             personalContacts = new List<Contact>
-        {
-            new PersonalContact { FirstName = "John", LastName = "Doe", PhoneNumber = "123-456-7890", Email = "john.doe@example.com", BirthDate = new DateTime(1990, 5, 15), Address = "123 Main St, City" }
-        };
+            {
+            new PersonalContact { FirstName = "Олексій", LastName = "Суркаєв", PhoneNumber = "097665432", Email = "surkaev@example.com", BirthDate = new DateTime(1990, 5, 15), Address = "м. Київ, вул.П'ятигорська, 8" },
+            new PersonalContact { FirstName = "Максим", LastName = "Ігнатенко", PhoneNumber = "0967754321", Email = "ihnatenko@example.com", BirthDate = new DateTime(1985, 8, 20), Address = "м. Львів, вул. М.Коперника, 22" },
+            new PersonalContact { FirstName = "Максим", LastName = "Лисенко", PhoneNumber = "0556743288", Email = "lysenko.com", BirthDate = new DateTime(1978, 3, 10), Address = "м. Харків, вул. Мар'їнська, 37" }
+            };
 
             businessContacts = new List<Contact>
-        {
-            new BusinessContact { FirstName = "Jane", LastName = "Smith", PhoneNumber = "987-654-3210", Email = "jane.smith@example.com", CompanyName = "ABC Corp", Position = "Manager" }
-        };
+            {
+            new BusinessContact { FirstName = "Влад", LastName = "Ковальчук", PhoneNumber = "0675432887", Email = "kovalchuk@example.com", CompanyName = "ABC Corp", Position = "Менеджер" },
+            new BusinessContact { FirstName = "Ольга", LastName = "Мельник", PhoneNumber = "0976548609", Email = "melnuk@example.com", CompanyName = "XYZ Ltd", Position = "Директор" },
+            };
 
             // Заповнення списків контактів при запуску додатку
             PopulateContactList(listViewPersonalContacts, personalContacts);
@@ -59,6 +61,81 @@ namespace oop10_contacts
             }
         }
 
+        private void btnAddContact_Click(object sender, EventArgs e)
+        {
+            using (AddPersonalContactForm addForm = new AddPersonalContactForm())
+            {
+                if (addForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Отримання даних з форми
+                    PersonalContact newPersonalContact = new PersonalContact
+                    {
+                        FirstName = addForm.FirstName,
+                        LastName = addForm.LastName,
+                        PhoneNumber = addForm.PhoneNumber,
+                        Email = addForm.Email,
+                        BirthDate = addForm.BirthDate,
+                        Address = addForm.Address
+                    };
+
+                    // Додавання нового контакту до списку
+                    personalContacts.Add(newPersonalContact);
+
+                    // Оновлення таблиці
+                    PopulateContactList(listViewPersonalContacts, personalContacts);
+                }
+            }
+        }
+
+        private void btnAddBusinessContact_Click(object sender, EventArgs e)
+        {
+            using (AddBusinessContactForm addForm = new AddBusinessContactForm())
+            {
+                if (addForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Отримання даних з форми
+                    BusinessContact newBusinessContact = new BusinessContact
+                    {
+                        FirstName = addForm.FirstName,
+                        LastName = addForm.LastName,
+                        PhoneNumber = addForm.PhoneNumber,
+                        Email = addForm.Email,
+                        CompanyName = addForm.Company,
+                        Position = addForm.Position
+                    };
+
+                    // Додавання нового бізнес-контакту до списку
+                    businessContacts.Add(newBusinessContact);
+
+                    // Оновлення таблиці бізнес-контактів
+                    PopulateContactList(listViewBusinessContacts, businessContacts);
+                }
+            }
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            using (DeleteContactForm deleteForm = new DeleteContactForm())
+            {
+                if (deleteForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Отримання номеру телефону для видалення
+                    string phoneNumberToDelete = deleteForm.PhoneNumber;
+
+                    // Пошук контакту за номером телефону і видалення його зі списку
+                    Contact contactToRemove = personalContacts.Find(c => c.PhoneNumber == phoneNumberToDelete);
+                    if (contactToRemove != null)
+                    {
+                        personalContacts.Remove(contactToRemove);
+                        PopulateContactList(listViewPersonalContacts, personalContacts);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Контакт не знайдений.", "Помилка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
     }
 
     public class Contact
