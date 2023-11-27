@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -8,64 +8,38 @@ namespace oop10_contacts
 {
     public partial class Form1 : Form
     {
-        private List<Contact> contacts;
+        private List<Contact> personalContacts;
+        private List<Contact> businessContacts;
+
         public Form1()
         {
             InitializeComponent();
 
-            LoadContacts();
-
-            // Заповнення списку контактів при запуску додатку
-            PopulateContactList();
-        }
-
-        private void LoadContacts()
+            // Ініціалізація списків контактів (додайте власні дані)
+            personalContacts = new List<Contact>
         {
-            string filePath = @"C:\Users\1\source\repos\oop10_contacts\oop10_contacts\contacts.json";
+            new PersonalContact { FirstName = "John", LastName = "Doe", PhoneNumber = "123-456-7890", Email = "john.doe@example.com", BirthDate = new DateTime(1990, 5, 15), Address = "123 Main St, City" }
+        };
 
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    string json = File.ReadAllText(filePath);
-                    contacts = JsonConvert.DeserializeObject<List<Contact>>(json);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Помилка при читанні файлу: {ex.Message}", "Помилка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            else
-            {
-                // Якщо файл не існує, ініціалізуємо пустий список
-                contacts = new List<Contact>();
-            }
-        }
-
-        private void SaveContacts()
+            businessContacts = new List<Contact>
         {
-            string filePath = @"C:\Users\1\source\repos\oop10_contacts\oop10_contacts\contacts.json";
+            new BusinessContact { FirstName = "Jane", LastName = "Smith", PhoneNumber = "987-654-3210", Email = "jane.smith@example.com", CompanyName = "ABC Corp", Position = "Manager" }
+        };
 
-            try
-            {
-                string json = JsonConvert.SerializeObject(contacts, Formatting.Indented);
-                File.WriteAllText(filePath, json);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Помилка при збереженні файлу: {ex.Message}", "Помилка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            // Заповнення списків контактів при запуску додатку
+            PopulateContactList(listViewPersonalContacts, personalContacts);
+            PopulateContactList(listViewBusinessContacts, businessContacts);
         }
 
-        private void PopulateContactList()
+        private void PopulateContactList(ListView listView, List<Contact> contacts)
         {
             // Очищення вмісту списку перед оновленням
-            listViewContacts.Items.Clear();
+            listView.Items.Clear();
 
             // Додавання кожного контакту до списку
             foreach (var contact in contacts)
             {
-                ListViewItem item = new ListViewItem(new[] { contact.FirstName, contact.LastName, contact.PhoneNumber, contact.Email, GetContactType(contact) });
+                ListViewItem item = new ListViewItem(new[] { contact.FirstName, contact.LastName, contact.PhoneNumber, contact.Email });
 
                 // Перевірка, чи контакт є особистим або бізнесовим і додавання відповідних додаткових даних
                 if (contact is PersonalContact)
@@ -81,30 +55,10 @@ namespace oop10_contacts
                     item.SubItems.Add(businessContact.Position);
                 }
 
-                listViewContacts.Items.Add(item);
+                listView.Items.Add(item);
             }
         }
 
-        private string GetContactType(Contact contact)
-        {
-            if (contact is PersonalContact)
-            {
-                return "Personal";
-            }
-            else if (contact is BusinessContact)
-            {
-                return "Business";
-            }
-            else
-            {
-                return "Unknown";
-            }
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            SaveContacts();
-        }
     }
 
     public class Contact
